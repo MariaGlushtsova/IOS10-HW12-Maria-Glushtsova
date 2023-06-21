@@ -56,15 +56,55 @@
 		8454D16A2A4360EB001B9842 /* IOS10-HW12-Maria Glushtsova */ = {
 			isa = PBXGroup;
 			children = (
-				8454D16B2A4360EB001B9842 /* AppDelegate.swift */,
-				8454D16D2A4360EB001B9842 /* SceneDelegate.swift */,
-				8454D16F2A4360EB001B9842 /* ViewController.swift */,
-				8454D1712A4360EB001B9842 /* Main.storyboard */,
-				8454D1742A4360ED001B9842 /* Assets.xcassets */,
-				8454D1762A4360ED001B9842 /* LaunchScreen.storyboard */,
-				8454D1792A4360ED001B9842 /* Info.plist */,
+				8454D1822A438E6E001B9842 /* Resources */,
+				8454D1832A438E8D001B9842 /* Sources */,
 			);
 			path = "IOS10-HW12-Maria Glushtsova";
+			sourceTree = "<group>";
+		};
+		8454D17F2A438E2F001B9842 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				8454D16B2A4360EB001B9842 /* AppDelegate.swift */,
+				8454D16D2A4360EB001B9842 /* SceneDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		8454D1802A438E3D001B9842 /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				8454D1712A4360EB001B9842 /* Main.storyboard */,
+				8454D1762A4360ED001B9842 /* LaunchScreen.storyboard */,
+			);
+			path = Storyboards;
+			sourceTree = "<group>";
+		};
+		8454D1812A438E55001B9842 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				8454D1792A4360ED001B9842 /* Info.plist */,
+			);
+			path = Configuration;
+			sourceTree = "<group>";
+		};
+		8454D1822A438E6E001B9842 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8454D1742A4360ED001B9842 /* Assets.xcassets */,
+				8454D1812A438E55001B9842 /* Configuration */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		8454D1832A438E8D001B9842 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				8454D16F2A4360EB001B9842 /* ViewController.swift */,
+				8454D17F2A438E2F001B9842 /* App */,
+				8454D1802A438E3D001B9842 /* Storyboards */,
+			);
+			path = Sources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -288,7 +328,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "IOS10-HW12-Maria Glushtsova/Info.plist";
+				INFOPLIST_FILE = "IOS10-HW12-Maria Glushtsova/Resources/Configuration/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -315,7 +355,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "IOS10-HW12-Maria Glushtsova/Info.plist";
+				INFOPLIST_FILE = "IOS10-HW12-Maria Glushtsova/Resources/Configuration/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
