@@ -86,23 +86,26 @@ class ViewController: UIViewController {
         return String(format: "%02i:%02i", minutes, seconds)
     }
     
-    @objc func startButtonTapped() {
+    @objc func startButtonTapped(_ sender: UIButton) {
         
-        if startButton.isTouchInside {
+        sender.isSelected.toggle();
+        if startButton.isSelected {
             
+            startButton.setImage(UIImage(systemName: "pause.fill"), for: .selected)
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
 
+        } else {
+            
+            startButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            timer.invalidate()
         }
     }
-    
-    
     
     @objc func timerAction() {
         
         step()
         timerLabel.text = "\((convertSecondsToTime(timeInSecomds: timeToShow)))"
         
-
     }
     
     @objc func step() {
