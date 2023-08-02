@@ -9,22 +9,22 @@ import UIKit
 import SnapKit
 
 class ViewController: UIViewController {
-    
-    private var isStarted = false
-    
+        
     // MARK: - Outlets
     
     var timer = Timer()
-    var timeToShow = 10
-    var workTimeRemaining = 10
-    var breakTimeRemaining = 5
-    var workPeriodLength = 10
-    var breakPeriodLength = 5
-    var timeToWork = true
+    private var runCount = 0.0
+    private var duration = 25.0
+    private var fromValue: CGFloat = 1
+    private var toValue: CGFloat = 0
+    private var workingTime = 25.0
+    private var restTime = 10.0
+    private var timeToWork = true
+    private var isStarted = false
     
     private lazy var timerLabel: UILabel = {
         let label = UILabel()
-        label.text = (convertSecondsToTime(timeInSecomds: timeToShow))
+        label.text = String(Int(duration))
         label.font = .systemFont(ofSize: 40)
         label.textColor = UIColor(named: "textColor")
         return label
@@ -39,197 +39,108 @@ class ViewController: UIViewController {
         return button
     }()
     
-    private lazy var shapeView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "circle")
-        return imageView
+    private lazy var progressBarView: ProgressBarView = {
+        let view = ProgressBarView()
+        return view
     }()
     
-    let shapeLayer = CAShapeLayer()
-    
+    private lazy var mainImage: UIImageView = {
+        let image = UIImageView(image: UIImage(named: "MainImage"))
+        return image
+    }()
 
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        self.circleAnimation()
-        
-    }
-    
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
+        setupView()
         setupHierarchy()
         setupLayout()
-        
     }
     
     // MARK: - Setup
     
-    private func setupHierarchy() {
-        
+    private func setupView() {
         view.backgroundColor = UIColor(named: "viewColor")
+    }
+    
+    private func setupHierarchy() {
+        view.addSubview(progressBarView)
         view.addSubview(timerLabel)
         view.addSubview(startButton)
-        view.addSubview(shapeView)
-        
+        view.addSubview(mainImage)
     }
     
     private func setupLayout() {
         
+        progressBarView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview()
+        }
+        
         timerLabel.snp.makeConstraints { make in
-            
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
-            
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview()
         }
         
         startButton.snp.makeConstraints { make in
-            
-            make.centerX.equalTo(view)
+            make.centerX.equalToSuperview()
             make.centerY.equalTo(timerLabel).offset(180)
-            
         }
         
-        shapeView.snp.makeConstraints { make in
-            
-            make.width.equalTo(600)
-            make.height.equalTo(600)
-            make.centerX.equalTo(timerLabel)
-            make.centerY.equalTo(timerLabel).offset(-50)
-            
+        mainImage.snp.makeConstraints { make in
+            make.width.equalTo(164)
+            make.height.equalTo(205)
+            make.centerX.equalToSuperview()
+            make.centerY.equalTo(timerLabel).offset(-210)
         }
-        
     }
     
     // MARK: - Actions
-    
-    
-    func convertSecondsToTime(timeInSecomds: Int) -> String {
-        
-        let minutes = timeInSecomds / 60
-        let seconds = timeInSecomds % 60
-        
-        return String(format: "%02i:%02i", minutes, seconds)
-    }
-    
+
     @objc func startButtonTapped() {
         
         isStarted.toggle()
 
         switch isStarted {
         case true:
-
-            resumeAnimation()
+            progressBarView.resumeAnimation()
             startButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
         default:
-            pauseAnimation()
+            progressBarView.pauseAnimation()
             startButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
             timer.invalidate()
         }
     }
     
-    @objc func timerAction() {
-        
-        step()
+    @objc private func timerAction() {
+        let formatter = DateFormatter()
+        let rounded = runCount.rounded(.up)
+        let date = Date(timeIntervalSince1970: TimeInterval(rounded))
 
-        timerLabel.text = "\((convertSecondsToTime(timeInSecomds: timeToShow)))"
-        
-    }
-    
-    @objc func step() {
-        
-        if timeToWork == true {
-            
-            if workTimeRemaining >= 0 {
-                clockwiseAnimation(duration: CFTimeInterval(workTimeRemaining), from: 1, to: 0)
-                timeToShow = workTimeRemaining
-                workTimeRemaining -= 1
-                
-                
-            } else {
-                
-                timeToWork = false
-                workTimeRemaining = workPeriodLength
-                
-            }
-            
-        } else {
-            
-            if breakTimeRemaining >= 0 {
-                
-                timeToShow = breakTimeRemaining
-                clockwiseAnimation(duration: CFTimeInterval(breakTimeRemaining), from: 1, to: 0)
-                breakTimeRemaining -= 1
-                
-            } else {
-                
-                timeToWork = true
-                breakTimeRemaining = breakPeriodLength
-                
-            }
-            
+        formatter.dateFormat = "00:ss"
+        timerLabel.text = formatter.string(from: date)
+
+        guard rounded == 0 else {
+            runCount -= 0.01
+            return
         }
-        
-    }
-    
-    // MARK: - Animation
-    
-    func circleAnimation() {
-        
-        let endAngle = (-CGFloat.pi / 2)
-        let startAngle = 2 * CGFloat.pi + endAngle
-        let center = CGPoint(x: shapeView.frame.width / 2, y: shapeView.frame.height / 2)
-        let circulePath = UIBezierPath(arcCenter: center, radius: 138, startAngle: startAngle, endAngle: endAngle, clockwise: false)
-        
-        shapeLayer.path = circulePath.cgPath
-        shapeLayer.lineWidth = 40
-        shapeLayer.fillColor = UIColor.clear.cgColor
-        shapeLayer.strokeEnd = 1
-        shapeLayer.lineCap = CAShapeLayerLineCap.round
-        shapeLayer.strokeColor = UIColor(named: "buttonColor")?.cgColor
-        shapeView.layer.addSublayer(shapeLayer)
-        
-    }
-    
-//     func clockwiseAnimation() {
-//
-//        let clockwiseAnimation = CABasicAnimation(keyPath: "strokeEnd")
-//        clockwiseAnimation.toValue = 0
-//        clockwiseAnimation.duration = CFTimeInterval(timeToShow)
-//        clockwiseAnimation.fillMode = CAMediaTimingFillMode.forwards
-//        clockwiseAnimation.isRemovedOnCompletion = false
-//        shapeLayer.add(clockwiseAnimation, forKey: "clockwiseAnimation")
-//
-//    }
-    
-    func clockwiseAnimation(duration: TimeInterval, from: CGFloat, to: CGFloat) {
-        let clockwiseAnimation = CABasicAnimation(keyPath: "strokeEnd")
-        shapeLayer.strokeEnd = from
-        clockwiseAnimation.duration = duration
-        clockwiseAnimation.toValue = to
-        clockwiseAnimation.fillMode = .forwards
-        clockwiseAnimation.isRemovedOnCompletion = false
-        
-        shapeLayer.add(clockwiseAnimation, forKey: "progressAnim")
-    }
-    
-    func pauseAnimation() {
-        let pausedTime: CFTimeInterval = shapeLayer.convertTime(CACurrentMediaTime(), from: nil)
-        shapeLayer.speed = 0.0
-        shapeLayer.timeOffset = pausedTime
-   }
-    
-    func resumeAnimation() {
-        let pausedTime: CFTimeInterval = shapeLayer.timeOffset
-        shapeLayer.speed = 1.0
-        shapeLayer.timeOffset = 0.0
-        shapeLayer.beginTime = 0.0
-        let timeSincePause: CFTimeInterval = shapeLayer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
-        shapeLayer.beginTime = timeSincePause
-        
+
+        if timeToWork {
+            fromValue = 1
+            toValue = 0
+            duration = workingTime
+            runCount = workingTime
+            progressBarView.workProgressAnimation(duration: duration, from: fromValue, to: toValue)
+        } else {
+            fromValue = 0
+            toValue = 1
+            duration = restTime
+            runCount = restTime
+            progressBarView.restProgressAnimation(duration: duration, from: fromValue, to: toValue)
+        }
+        timeToWork.toggle()
     }
 }
