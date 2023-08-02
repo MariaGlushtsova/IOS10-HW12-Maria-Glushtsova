@@ -10,6 +10,8 @@ import SnapKit
 
 class ViewController: UIViewController {
     
+    private var isStarted = false
+    
     // MARK: - Outlets
     
     var timer = Timer()
@@ -113,16 +115,17 @@ class ViewController: UIViewController {
         return String(format: "%02i:%02i", minutes, seconds)
     }
     
-    @objc func startButtonTapped(_ sender: UIButton) {
+    @objc func startButtonTapped() {
         
-        sender.isSelected.toggle();
-        if startButton.isSelected {
-            clockwiseAnimation()
-            resumeAnimation()
-            startButton.setImage(UIImage(systemName: "pause.fill"), for: .selected)
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        isStarted.toggle()
 
-        } else {
+        switch isStarted {
+        case true:
+
+            resumeAnimation()
+            startButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        default:
             pauseAnimation()
             startButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
             timer.invalidate()
@@ -132,6 +135,7 @@ class ViewController: UIViewController {
     @objc func timerAction() {
         
         step()
+
         timerLabel.text = "\((convertSecondsToTime(timeInSecomds: timeToShow)))"
         
     }
@@ -141,7 +145,7 @@ class ViewController: UIViewController {
         if timeToWork == true {
             
             if workTimeRemaining >= 0 {
-                
+                clockwiseAnimation(duration: CFTimeInterval(workTimeRemaining), from: 1, to: 0)
                 timeToShow = workTimeRemaining
                 workTimeRemaining -= 1
                 
@@ -158,6 +162,7 @@ class ViewController: UIViewController {
             if breakTimeRemaining >= 0 {
                 
                 timeToShow = breakTimeRemaining
+                clockwiseAnimation(duration: CFTimeInterval(breakTimeRemaining), from: 1, to: 0)
                 breakTimeRemaining -= 1
                 
             } else {
@@ -190,31 +195,41 @@ class ViewController: UIViewController {
         
     }
     
-     func clockwiseAnimation() {
-        
+//     func clockwiseAnimation() {
+//
+//        let clockwiseAnimation = CABasicAnimation(keyPath: "strokeEnd")
+//        clockwiseAnimation.toValue = 0
+//        clockwiseAnimation.duration = CFTimeInterval(timeToShow)
+//        clockwiseAnimation.fillMode = CAMediaTimingFillMode.forwards
+//        clockwiseAnimation.isRemovedOnCompletion = false
+//        shapeLayer.add(clockwiseAnimation, forKey: "clockwiseAnimation")
+//
+//    }
+    
+    func clockwiseAnimation(duration: TimeInterval, from: CGFloat, to: CGFloat) {
         let clockwiseAnimation = CABasicAnimation(keyPath: "strokeEnd")
-        clockwiseAnimation.toValue = 0
-        clockwiseAnimation.duration = CFTimeInterval(timeToShow)
-        clockwiseAnimation.fillMode = CAMediaTimingFillMode.forwards
+        shapeLayer.strokeEnd = from
+        clockwiseAnimation.duration = duration
+        clockwiseAnimation.toValue = to
+        clockwiseAnimation.fillMode = .forwards
         clockwiseAnimation.isRemovedOnCompletion = false
-        shapeLayer.add(clockwiseAnimation, forKey: "clockwiseAnimation")
         
+        shapeLayer.add(clockwiseAnimation, forKey: "progressAnim")
     }
     
     func pauseAnimation() {
-       
-        let pausedTime = shapeLayer.convertTime(CACurrentMediaTime(), to: nil)
+        let pausedTime: CFTimeInterval = shapeLayer.convertTime(CACurrentMediaTime(), from: nil)
         shapeLayer.speed = 0.0
         shapeLayer.timeOffset = pausedTime
-
    }
     
     func resumeAnimation() {
-
-        let resumeTime = shapeLayer.convertTime(CACurrentMediaTime(), to: nil)
-        shapeLayer.speed = 1
-        shapeLayer.timeOffset = 0
-        shapeLayer.beginTime = resumeTime
+        let pausedTime: CFTimeInterval = shapeLayer.timeOffset
+        shapeLayer.speed = 1.0
+        shapeLayer.timeOffset = 0.0
+        shapeLayer.beginTime = 0.0
+        let timeSincePause: CFTimeInterval = shapeLayer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
+        shapeLayer.beginTime = timeSincePause
         
     }
 }
