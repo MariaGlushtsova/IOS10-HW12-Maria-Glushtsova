@@ -129,8 +129,8 @@ class ViewController: UIViewController {
         }
 
         if timeToWork {
-            fromValue = 1
-            toValue = 0
+            fromValue = 0
+            toValue = 1
             duration = workingTime
             runCount = workingTime
             progressBarView.workProgressAnimation(duration: duration, from: fromValue, to: toValue)
